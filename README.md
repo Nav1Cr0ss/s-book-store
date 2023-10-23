@@ -14,6 +14,8 @@
 - gcloud cli and prepared bucket
 
 ## Getting Started
+Migration is not a part of this service. 
+Use [migration folder](./migrations) for prepare db
 
 ### Local Environment
 1. Clone the repository:
