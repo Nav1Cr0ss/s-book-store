@@ -11,6 +11,7 @@
 ## Prerequisites
 - Python 3.11+
 - Docker (if you want to use Docker for local development)
+- gcloud cli and prepared bucket
 
 ## Getting Started
 
@@ -36,13 +37,19 @@
     ```shell
     cp .env.example .env
    
-5. Run App
+5. Auth in gcloud
+    ```shell
+    gcloud auth application-default login
+   
+6. Run App
 
     ```shell
     python main.py
    
 ### Docker
-1. Execute docker-compose
+1. Fill Google credentials file into env `GOOGLE_APPLICATION_CREDENTIALS`
+
+2. Execute docker-compose
     ```shell
     docker-compose-up
    
