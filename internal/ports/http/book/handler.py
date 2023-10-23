@@ -1,8 +1,7 @@
 import json
-from io import BytesIO
 from typing import Optional
 
-import openpyxl
+
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, StreamResponse
 from pydantic import ValidationError
@@ -21,7 +20,11 @@ class BookHandler(BookHandlerIface):
 
     async def get_book(self, request: Request) -> Response:
         book_id: int = int(request.match_info['id'])
-        book: Optional[BookSchema] = await self.app.get_book(book_id)
+        try:
+            book: Optional[BookSchema] = await self.app.get_book(book_id)
+        except ApiError as ae:
+            return Response(text=str(ae), status=ae.code)
+
         return Response(text=book.model_dump_json(), content_type='application/json', status=200)
 
     async def get_books(self, request: Request) -> Response:

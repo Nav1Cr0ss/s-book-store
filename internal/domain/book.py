@@ -41,7 +41,7 @@ class Book(Base):
         secondary=authors_books, back_populates="books"
     )
     date_published: Mapped[datetime] = mapped_column(DateTime())
-    file_url: Mapped[str] = mapped_column(String(150), default="")
+    file_name: Mapped[str] = mapped_column(String(150), default="")
     restricted: Mapped[bool] = mapped_column(Boolean, default=False)
 
     def __repr__(self) -> str:

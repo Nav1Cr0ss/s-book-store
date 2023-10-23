@@ -14,22 +14,33 @@ from settings import config
 
 
 async def main():
+    # db conn instance
     db = Postgres()
 
-    book_repo = BookRepo(db)
+    # gcp bucket
     storage_book = StorageBook()
+
+    # book repository
+    book_repo = BookRepo(db)
+
+    # app layer
     book_app = BookApp(book_repo, storage_book)
 
+    # http layer
     book_handler = BookHandler(book_app)
 
+    # list of routes with adapter which helps with custom route level middlewares
     book_routes = get_routes(book_handler)
-    book_routes = RouterFactory.get_routes(book_routes)
 
+    # aioHttp
     app = web.Application()
     logging.basicConfig(level=logging.INFO)
 
-    app.add_routes(book_routes)
+    # compile all handlers
+    # book_routes = RouterFactory.get_compiled_routes(book_routes)
+    RouterFactory.register_routes(app, book_routes)
 
+    # server config
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, config.Server.HOST, config.Server.PORT)

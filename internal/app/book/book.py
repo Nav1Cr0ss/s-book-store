@@ -18,11 +18,14 @@ class BookApp(BookAppIface):
 
     async def get_book(self, book_id: int) -> Optional[BookSchema]:
         book = await self.repo.get_book(book_id)
-        return BookSchema.from_orm(book)
+        if not book:
+            raise ErrNotFount("Book with this id not fount")
+
+        return BookSchema.model_validate(book)
 
     async def get_books(self, filters: BookFilter) -> BookListSchema:
         books = await self.repo.get_books(filters)
-        return BookListSchema([BookSchema.from_orm(book) for book in books])
+        return BookListSchema([BookSchema.model_validate(book) for book in books])
 
     async def create_book(self, book: BookCreateBody) -> int:
         author = await self.repo.get_author(book.author_id)
@@ -32,7 +35,6 @@ class BookApp(BookAppIface):
         book_data = book.model_dump()
         author_id = book_data.pop("author_id")
 
-        # book_data["file_url"] = file_url
         book_id = await self.repo.create_book(book_data)
 
         await self.repo.attach_book_to_author(
@@ -49,9 +51,9 @@ class BookApp(BookAppIface):
 
         file_name = f"{book.title}-{book.id}.pdf"
 
-        file_url = await self.storage.upload_book(file_bytes, file_name)
+        await self.storage.upload_book(file_bytes, file_name)
 
-        await self.repo.update_book(book_id, BookUpdate(file_url=file_url))
+        await self.repo.update_book(book_id, BookUpdate(file_name=file_name))
 
     async def download_book_file(self, book_id: int, read_only: Optional[bool] = False) -> (bytes, str):
         book = await self.repo.get_book(book_id)
@@ -61,11 +63,11 @@ class BookApp(BookAppIface):
         if read_only and book.restricted:
             raise ErrForbidden("Book not allowed for stream")
 
-        file = await self.storage.download_book(book.file_url)
+        file = await self.storage.download_book(book.file_name)
         if not file:
             raise ErrNotFount("File with this id not fount")
 
-        return file, book.file_url
+        return file, book.file_name
 
     async def upload_book_restrictions(self, restrictions_file: bytes) -> None:
         file_io = BytesIO(restrictions_file)

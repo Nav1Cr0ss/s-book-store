@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from internal.app.book.dto.book import BookListSchema
 from internal.domain.book import Author
+from pkg.pydantic_sqlalchemy.connector import sqlalchemy_to_pydantic
 
 PydanticAuthor = sqlalchemy_to_pydantic(Author)
 
