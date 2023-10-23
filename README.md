@@ -15,7 +15,7 @@
 
 ## Getting Started
 Migration is not a part of this service. 
-Use [migration folder](./migrations) for prepare db
+Use [migration folder](./migrations) to prepare db
 
 ### Local Environment
 1. Clone the repository:
